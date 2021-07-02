@@ -15,8 +15,9 @@ public class Client {
     }
 
     public void sendMsgToServer(Transfer transfer) throws IOException {
-        try (ObjectOutputStream serialization = new ObjectOutputStream(new FileOutputStream("transfer.bin"))) {
+        try (ObjectOutputStream serialization = new ObjectOutputStream(socket.getOutputStream())) {
             serialization.writeObject(transfer);
+            serialization.flush();
         }
     }
 

@@ -15,6 +15,7 @@ public class MainClass {
             String lineCommand = "";
             while (true) {
                 lineCommand = reader.readLine();
+                System.out.println("Пришел сюда");
                 ClientActions clientActions = ClientActions.getEnumFromCommand(lineCommand);
                 Transfer transfer = new Transfer();
                 transfer.setClientActions(clientActions);
