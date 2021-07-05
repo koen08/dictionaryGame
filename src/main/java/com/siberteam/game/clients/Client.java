@@ -1,5 +1,6 @@
 package com.siberteam.game.clients;
 
+import com.google.gson.Gson;
 import com.siberteam.game.server.AnswerServerTransfer;
 import com.siberteam.game.server.Transfer;
 
@@ -15,9 +16,8 @@ public class Client {
     }
 
     public void sendMsgToServer(Transfer transfer) throws IOException {
-        try (ObjectOutputStream serialization = new ObjectOutputStream(socket.getOutputStream())) {
-            serialization.writeObject(transfer);
-            serialization.flush();
+        try (BufferedWriter serialization = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+            serialization.write(new Gson().toJson(transfer));
         }
     }
 

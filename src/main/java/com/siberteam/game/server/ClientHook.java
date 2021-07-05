@@ -1,5 +1,7 @@
 package com.siberteam.game.server;
 
+import com.google.gson.Gson;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayDeque;
@@ -10,7 +12,7 @@ public class ClientHook extends Thread {
     private final Server server;
     private String nickName;
     private final Deque<String> words;
-    private ObjectInputStream deserialization;
+    private BufferedReader deserialization;
     public ClientHook(Socket socket, Server server) throws IOException {
         this.socket = socket;
         this.server = server;
@@ -22,9 +24,11 @@ public class ClientHook extends Thread {
     public void run() {
         try {
             InputStream input = socket.getInputStream();
-            deserialization = new ObjectInputStream(input);
+            deserialization = new BufferedReader(new InputStreamReader(input));
             while (true) {
-                Transfer transfer = (Transfer) deserialization.readObject();
+                String str = deserialization.readLine();
+                System.out.println(str);
+                Transfer transfer = new Gson().fromJson(deserialization.readLine(), Transfer.class);
                 switch (transfer.getClientActions()) {
                     case CREATE_ROOM:
                         Room room = new Room();
@@ -40,7 +44,7 @@ public class ClientHook extends Thread {
                         break;
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

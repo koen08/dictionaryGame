@@ -6,6 +6,11 @@ public class Transfer implements Serializable {
     private ClientActions clientActions;
     private String message;
 
+    public Transfer(ClientActions clientActions, String message) {
+        this.clientActions = clientActions;
+        this.message = message;
+    }
+
     public String getMessage() {
         return message;
     }
