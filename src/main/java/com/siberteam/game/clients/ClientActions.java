@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ClientActions {
+    REGISTER_SERVER("/register"),
     CREATE_ROOM("/create"),
-    REPEAT_GAME("/repeat"),
     DELETE_ROOM("/delete"),
+    EXIT_ROOM("/exit_room"),
     START_GAME("/start"),
     EXIT_GAME("/exit"),
     CONNECT_ROOM("/connect"),
-    MAKE_MOVE("/send");
+    DOWNLOAD_DICTIONARY("/download");
     public static Map<String, ClientActions> CLIENT_ACTIONS_MAP = new HashMap<>();
     private final String command;
 
