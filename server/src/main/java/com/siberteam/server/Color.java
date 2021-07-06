@@ -1,4 +1,4 @@
-package com.siberteam.game.clients;
+package com.siberteam.server;
 
 public enum Color {
     ANSI_RESET("\u001B[0m") {
@@ -7,7 +7,7 @@ public enum Color {
             return ANSI_RESET.codeColor + msg + ANSI_RESET.codeColor;
         }
     },
-    ANSI_RED("\u001B[31m"){
+    ANSI_RED("\u001B[31m") {
         @Override
         public String paint(String msg) {
             return ANSI_RED.codeColor + msg + ANSI_RESET.codeColor;

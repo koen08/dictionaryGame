@@ -1,4 +1,4 @@
-package com.siberteam.game.clients;
+package com.siberteam.client;
 
 import java.util.HashMap;
 import java.util.Map;

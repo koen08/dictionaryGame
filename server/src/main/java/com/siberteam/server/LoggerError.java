@@ -1,6 +1,4 @@
-package com.siberteam.game.clients;
-
-import com.siberteam.game.server.Color;
+package com.siberteam.server;
 
 public class LoggerError {
     public static void log(String messageLog) {

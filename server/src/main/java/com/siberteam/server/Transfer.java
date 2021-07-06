@@ -1,6 +1,4 @@
-package com.siberteam.game.server;
-
-import com.siberteam.game.clients.ClientActions;
+package com.siberteam.server;
 
 import java.io.Serializable;
 import java.util.Deque;

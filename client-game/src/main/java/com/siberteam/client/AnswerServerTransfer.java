@@ -1,18 +1,12 @@
-package com.siberteam.game.clients;
+package com.siberteam.client;
 
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class Transfer implements Serializable {
-    private ClientActions clientActions;
+public class AnswerServerTransfer implements Serializable {
     private String message;
     private Deque<String> dictionaryWords = new ArrayDeque<>();
-
-    public Transfer(ClientActions clientActions, String message) {
-        this.clientActions = clientActions;
-        this.message = message;
-    }
 
     public Deque<String> getDictionaryWords() {
         return dictionaryWords;
@@ -22,19 +16,15 @@ public class Transfer implements Serializable {
         this.dictionaryWords = dictionaryWords;
     }
 
+    public AnswerServerTransfer(String message) {
+        this.message = message;
+    }
+
     public String getMessage() {
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public ClientActions getClientActions() {
-        return clientActions;
-    }
-
-    public void setClientActions(ClientActions clientActions) {
-        this.clientActions = clientActions;
     }
 }

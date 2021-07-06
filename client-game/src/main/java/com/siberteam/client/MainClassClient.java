@@ -1,38 +1,40 @@
-package com.siberteam.game.clients;
+package com.siberteam.client;
 
-import java.io.*;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class MainClass {
+public class MainClassClient {
 
     public static void main(String[] args) {
         try {
             outputMessageConsole("Введите команду /help, чтобы посмотреть возможные команды");
-            Client client = new Client();
+            ClientManager client = new ClientManager();
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             MessageReaderThread messageReaderThread = new MessageReaderThread(client);
             messageReaderThread.start();
             StringBuilder lineCommand = new StringBuilder();
             while (!lineCommand.append(reader.readLine()).toString().equals("/exit")) {
-                if (lineCommand.toString().equals("/help")){
+                if (lineCommand.toString().equals("/help")) {
                     outputHelper();
                     lineCommand.setLength(0);
                     continue;
                 }
-                Transfer transfer = MainClass.splitStringToken(lineCommand.toString());
-                if (transfer.getClientActions() != null){
+                Transfer transfer = MainClassClient.splitStringToken(lineCommand.toString());
+                if (transfer.getClientActions() != null) {
                     if (transfer.getClientActions().equals(ClientActions.DOWNLOAD_DICTIONARY)) {
-                        transfer.setDictionaryWords(MainClass.formingDequeFromFileDictionary(transfer.getMessage()));
+                        transfer.setDictionaryWords(
+                                new FileStreamWorker().formingDequeFromFileDictionary(transfer.getMessage()));
                     }
                     client.sendMsgToServer(transfer);
                     lineCommand.setLength(0);
-                } else{
+                } else {
                     outputMessageConsole(Color.ANSI_RED.paint(
                             "Такой команды нет. Введите /help, чтобы посмотреть список команд"));
                 }
-
             }
+            client.sendMsgToServer(new Transfer(ClientActions.EXIT_GAME, ""));
+            outputMessageConsole("Вы отключились от сервера");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,16 +62,5 @@ public class MainClass {
         return new Transfer(ClientActions.getEnumFromCommand(args[0]), args[1]);
     }
 
-    public static Deque<String> formingDequeFromFileDictionary(String path) {
-        Deque<String> dictionary = new ArrayDeque<>();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
-            String word;
-            while ((word = bufferedReader.readLine()) != null) {
-                dictionary.add(word);
-            }
-        } catch (Exception e) {
-            LoggerError.log("Проблема загрзуки словаря, проверьте путь к файлу...");
-        }
-        return dictionary;
-    }
+
 }
