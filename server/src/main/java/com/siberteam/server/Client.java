@@ -49,8 +49,9 @@ public class Client extends Thread {
                             room = server.searchRoom(Integer.parseInt(transfer.getMessage()));
                             if (room != null) {
                                 room.addClientIntoRoom(this);
-                            } else
+                            } else {
                                 sendMsgToSender("Комнаты с номером " + transfer.getMessage() + " не существует");
+                            }
                         }
                         break;
                     case DELETE_ROOM:
@@ -70,6 +71,9 @@ public class Client extends Thread {
                         if (transfer.getDictionaryWords() != null) {
                             room.downloadDictionary(this, transfer.getDictionaryWords());
                         }
+                        break;
+                    case MADE_MOVE:
+                        room.addWordToSlot(this, transfer.getMessage());
                         break;
                     case EXIT_GAME:
                         server.removeClient(this);

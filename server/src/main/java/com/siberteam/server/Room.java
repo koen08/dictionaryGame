@@ -10,15 +10,16 @@ public class Room {
     static final int INDEX_CREATOR = 0;
     private List<Client> clientsRoom = new CopyOnWriteArrayList<>();
     private List<Deque<String>> dictionaryClients = new CopyOnWriteArrayList<>();
+    private List<StringBuilder> slotClients = new CopyOnWriteArrayList<>();
     private boolean isGameStart = false;
 
     public void startGame(Client client) throws IOException, InterruptedException {
         if (client.equals(clientsRoom.get(INDEX_CREATOR))) {
             if (clientsRoom.size() > 1) {
                 isGameStart = true;
-                GameDictionary gameDictionary = new GameDictionary(this);
+                Game game = new CarbonCopyWordGame(this);
                 if (isAllReadyWithDictionary() && isUniquenessDictionaries()) {
-                    gameDictionary.startGame();
+                    game.startGame();
                 }
                 isGameStart = false;
             } else client.sendMsgToSender(Color.ANSI_RED.paint("Комната должна иметь хотя бы 2 участника"));
@@ -45,6 +46,7 @@ public class Room {
         if (!clientsRoom.contains(client) && !isGameStart) {
             clientsRoom.add(client);
             dictionaryClients.add(new ConcurrentLinkedDeque<>());
+            slotClients.add(new StringBuilder());
             messageRoom("Пользователь " + client.getNickName() + " подключился к комнате");
             messageRoom("Количество игроков в комнате - " + clientsRoom.size());
         }
@@ -98,6 +100,11 @@ public class Room {
         return true;
     }
 
+    public void addWordToSlot(Client client, String word) {
+        int indexClient = clientsRoom.indexOf(client);
+        slotClients.get(indexClient).append(word);
+    }
+
     public void messageRoom(String msg) throws IOException {
         for (Client client : clientsRoom) {
             client.sendMsgToSender(msg);
@@ -118,5 +125,9 @@ public class Room {
 
     public void setDictionaryClients(List<Deque<String>> dictionaryClients) {
         this.dictionaryClients = dictionaryClients;
+    }
+
+    public List<StringBuilder> getSlotClients() {
+        return slotClients;
     }
 }

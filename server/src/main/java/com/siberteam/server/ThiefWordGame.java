@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Deque;
 import java.util.Random;
 
-public class GameDictionary {
+public class ThiefWordGame implements Game {
     private final Room room;
 
-    public GameDictionary(Room room) {
+    public ThiefWordGame(Room room) {
         this.room = room;
     }
 
@@ -35,7 +35,8 @@ public class GameDictionary {
         }
     }
 
-    private boolean isOneWinner() {
+    @Override
+    public boolean isOneWinner() {
         int countLosers = 0;
         for (Deque<String> dictionaryClient : room.getDictionaryClients()) {
             if (dictionaryClient.isEmpty()) {
@@ -44,8 +45,8 @@ public class GameDictionary {
         }
         return countLosers + 1 == room.getClientsRoom().size();
     }
-
-    private Client searchWinner() {
+    @Override
+    public Client searchWinner() {
         Client client = null;
         for (int i = 0; i < room.getDictionaryClients().size(); i++) {
             if (!room.getDictionaryClients().get(i).isEmpty()) {
@@ -54,8 +55,8 @@ public class GameDictionary {
         }
         return client;
     }
-
-    private int getRandomIndexWithRepeat(int player) {
+    @Override
+    public int getRandomIndexWithRepeat(int player) {
         int playerLostWordRandom = 0;
         do {
             playerLostWordRandom = new Random().nextInt(room.getClientsRoom().size());

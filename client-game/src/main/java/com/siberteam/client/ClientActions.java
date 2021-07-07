@@ -11,7 +11,8 @@ public enum ClientActions {
     START_GAME("/start"),
     EXIT_GAME("/exit"),
     CONNECT_ROOM("/connect"),
-    DOWNLOAD_DICTIONARY("/download");
+    DOWNLOAD_DICTIONARY("/download"),
+    MADE_MOVE("/send");
     public static Map<String, ClientActions> CLIENT_ACTIONS_MAP = new HashMap<>();
     private final String command;
 
