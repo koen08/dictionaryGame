@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Deque;
+import java.net.SocketException;
+import java.util.ArrayDeque;
+import java.util.Collection;
 
 public class Client extends Thread {
     private final Socket socket;
@@ -26,7 +28,7 @@ public class Client extends Thread {
     @Override
     public void run() {
         try {
-            sendMsgToSender("Добро пожаловать, пожалуйста, пройдите регистрацию (/register nickname)");
+            sendMsgToClient("Добро пожаловать, пожалуйста, пройдите регистрацию (/register nickname)");
             while (isNonExit) {
                 Transfer transfer = new Gson().fromJson(deserialization.readLine(), Transfer.class);
                 if (!transfer.getClientActions().equals(ClientActions.REGISTER_SERVER) && isAuth()) {
@@ -35,14 +37,16 @@ public class Client extends Thread {
                 switch (transfer.getClientActions()) {
                     case REGISTER_SERVER:
                         setNickName(transfer.getMessage());
-                        sendMsgToSender(Color.ANSI_GREEN.paint("Вы успешно зарегистрировались в системе"));
+                        sendMsgToClient(Color.ANSI_GREEN.paint("Вы успешно зарегистрировались в системе"));
                         break;
                     case CREATE_ROOM:
                         if (room == null) {
                             room = new Room();
                             room.addClientIntoRoom(this);
-                            sendMsgToSender(server.createRoom(room));
-                        } else sendMsgToSender(Color.ANSI_RED.paint("Вы уже являетесь участником группы"));
+                            sendMsgToClient(server.createRoom(room));
+                        } else {
+                            sendMsgToClient(Color.ANSI_RED.paint("Вы уже являетесь участником группы"));
+                        }
                         break;
                     case CONNECT_ROOM:
                         if (room == null) {
@@ -50,7 +54,7 @@ public class Client extends Thread {
                             if (room != null) {
                                 room.addClientIntoRoom(this);
                             } else {
-                                sendMsgToSender("Комнаты с номером " + transfer.getMessage() + " не существует");
+                                sendMsgToClient("Комнаты с номером " + transfer.getMessage() + " не существует");
                             }
                         }
                         break;
@@ -87,31 +91,31 @@ public class Client extends Thread {
                         break;
                 }
             }
-        } catch (Exception e) {
-            if (e.getMessage() == null) {
+        } catch (SocketException se){
                 LoggerError.log("Пользователь " + nickName + " принудительно закрыл программу");
                 server.removeClient(this);
                 isNonExit = false;
-            }
+        }
+        catch (Exception e) {
             LoggerError.log(e.getMessage());
         }
     }
 
-    public void sendMsgToSender(String msg) throws IOException {
+    public void sendMsgToClient(String msg) throws IOException {
         serialization.write(new Gson().toJson(new AnswerServerTransfer(msg, null)));
         serialization.newLine();
         serialization.flush();
     }
 
-    public void sendMsgWithDequeToSender(String msg, Deque<String> deque) throws IOException {
-        serialization.write(new Gson().toJson(new AnswerServerTransfer(msg, deque)));
+    public void sendMsgWithCollectionToSender(String msg, Collection<String> collection) throws IOException {
+        serialization.write(new Gson().toJson(new AnswerServerTransfer(msg, new ArrayDeque<>(collection))));
         serialization.newLine();
         serialization.flush();
     }
 
     public boolean isAuth() throws IOException {
         if (nickName == null) {
-            sendMsgToSender("Пожалуйста, пройдите регистрацию (/register nickname)");
+            sendMsgToClient("Пожалуйста, пройдите регистрацию (/register nickname)");
             return true;
         }
         return false;

@@ -3,6 +3,7 @@ package com.siberteam.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.*;
 
 public class MainClassClient {
 
@@ -10,6 +11,8 @@ public class MainClassClient {
         try {
             outputMessageConsole("Введите команду /help, чтобы посмотреть возможные команды");
             ClientManager client = new ClientManager();
+            Random random = new Random();
+            List<String> dictionaryList = new ArrayList<>();
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             MessageReaderThread messageReaderThread = new MessageReaderThread(client);
             messageReaderThread.start();
@@ -23,8 +26,15 @@ public class MainClassClient {
                 Transfer transfer = MainClassClient.splitStringToken(lineCommand.toString());
                 if (transfer.getClientActions() != null) {
                     if (transfer.getClientActions().equals(ClientActions.DOWNLOAD_DICTIONARY)) {
+                        dictionaryList = new FileStreamWorker().
+                                formingDequeFromFileDictionary(
+                                        transfer.getMessage());
                         transfer.setDictionaryWords(
-                                new FileStreamWorker().formingDequeFromFileDictionary(transfer.getMessage()));
+                                new ArrayDeque<>(dictionaryList));
+                    }
+                    if (transfer.getClientActions().equals(ClientActions.MADE_MOVE)) {
+                        transfer.setMessage(dictionaryList.get(random.nextInt(dictionaryList.size())));
+                        outputMessageConsole("Вы отправили случайное слово. Ожидайте начала раунда!");
                     }
                     client.sendMsgToServer(transfer);
                     lineCommand.setLength(0);

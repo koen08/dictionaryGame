@@ -6,24 +6,33 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Room {
+public class Room extends Thread{
     static final int INDEX_CREATOR = 0;
     private List<Client> clientsRoom = new CopyOnWriteArrayList<>();
     private List<Deque<String>> dictionaryClients = new CopyOnWriteArrayList<>();
     private List<StringBuilder> slotClients = new CopyOnWriteArrayList<>();
     private boolean isGameStart = false;
 
+    @Override
+    public void run() {
+        Game game = new ThiefWordGame(this);
+        try {
+            game.startGame();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startGame(Client client) throws IOException, InterruptedException {
         if (client.equals(clientsRoom.get(INDEX_CREATOR))) {
             if (clientsRoom.size() > 1) {
                 isGameStart = true;
-                Game game = new CarbonCopyWordGame(this);
                 if (isAllReadyWithDictionary() && isUniquenessDictionaries()) {
-                    game.startGame();
+                    start();
                 }
                 isGameStart = false;
-            } else client.sendMsgToSender(Color.ANSI_RED.paint("Комната должна иметь хотя бы 2 участника"));
-        } else client.sendMsgToSender(Color.ANSI_RED.paint("Вы не явялетесь создателем комнаты"));
+            } else client.sendMsgToClient(Color.ANSI_RED.paint("Комната должна иметь хотя бы 2 участника"));
+        } else client.sendMsgToClient(Color.ANSI_RED.paint("Вы не явялетесь создателем комнаты"));
     }
 
     private boolean isUniquenessDictionaries() throws IOException {
@@ -56,7 +65,7 @@ public class Room {
         if (!isGameStart) {
             clientsRoom.remove(client);
             client.setRoom(null);
-            client.sendMsgToSender("Вы покинули группу");
+            client.sendMsgToClient("Вы покинули группу");
             messageRoom(client.getNickName() + " покинул комнату" + ", размер комнаты - " + clientsRoom.size());
         }
     }
@@ -64,10 +73,10 @@ public class Room {
     public void deleteRoom(Client client) throws IOException {
         if (client.equals(clientsRoom.get(INDEX_CREATOR)) && !isGameStart) {
             for (Client cl : clientsRoom) {
-                cl.sendMsgToSender("Комната была удалена, вы вернулись в главное меню");
+                cl.sendMsgToClient("Комната была удалена, вы вернулись в главное меню");
                 cl.setRoom(null);
             }
-        } else client.sendMsgToSender("Вы не явялетесь создателем комнаты");
+        } else client.sendMsgToClient("Вы не явялетесь создателем комнаты");
     }
 
     public void downloadDictionary(Client client, Deque<String> deque) throws IOException {
@@ -77,7 +86,7 @@ public class Room {
             while (!deque.isEmpty()) {
                 dictionaryClients.get(indexClientsIntoRoom).add(deque.pop());
             }
-            client.sendMsgToSender(Color.ANSI_GREEN.paint("Вы успешно загрузили свой словарь"));
+            client.sendMsgToClient(Color.ANSI_GREEN.paint("Вы успешно загрузили свой словарь"));
             messageRoom(Color.ANSI_GREEN.paint("Игрок с ником " +
                     client.getNickName() + " загрузил свой словарь и готов к игре!"));
         }
@@ -107,7 +116,7 @@ public class Room {
 
     public void messageRoom(String msg) throws IOException {
         for (Client client : clientsRoom) {
-            client.sendMsgToSender(msg);
+            client.sendMsgToClient(msg);
         }
     }
 

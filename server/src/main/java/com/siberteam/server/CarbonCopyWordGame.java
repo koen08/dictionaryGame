@@ -2,15 +2,16 @@ package com.siberteam.server;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CarbonCopyWordGame implements Game {
-    private Room room;
+    private final Room room;
     private Random random;
-    private List<Set<String>> resultsCopyWords;
+    private final List<Set<String>> resultsCopyWords;
 
     public CarbonCopyWordGame(Room room) {
         this.room = room;
-        resultsCopyWords = new ArrayList<>();
+        resultsCopyWords = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -18,7 +19,8 @@ public class CarbonCopyWordGame implements Game {
         doSlotsForClient();
         int round = 0;
         random = new Random();
-        room.messageRoom(Color.ANSI_GREEN.paint("Ожидание хода всех игроков"));
+        room.messageRoom(
+                Color.ANSI_GREEN.paint("Ожидание хода всех игроков. Введите команду /send чтобы сделать ход"));
         while (!isOneWinner()) {
             if (everyoneMadeMove()) {
                 round++;
@@ -28,11 +30,25 @@ public class CarbonCopyWordGame implements Game {
                             room.getSlotClients().get(getRandomIndexWithRepeat(i)).toString());
                 }
                 finishRound();
-                room.messageRoom(Color.ANSI_GREEN.paint("Ожидание хода всех игроков"));
+                sendActualDictionaryAllClients();
+                room.messageRoom(
+                        Color.ANSI_GREEN.paint(
+                                "Ожидание хода всех игроков. Введите команду /send чтобы сделать ход"));
             }
         }
         Client clientWinner = searchWinner();
         room.messageRoom(Color.ANSI_YELLOW.paint("Игрок " + clientWinner.getNickName() + " победил!"));
+        clientWinner.sendMsgWithCollectionToSender(
+                "Вы загрузили слова игроков", resultsCopyWords.get(
+                        room.getClientsRoom().indexOf(clientWinner)));
+    }
+
+    private void sendActualDictionaryAllClients() throws IOException {
+        for (int i = 0; i < room.getClientsRoom().size(); i++){
+            room.getClientsRoom().get(i).sendMsgToClient(
+                    Color.ANSI_BLUE.paint(
+                            "На данный момент вы скопировали следующие слова: " + resultsCopyWords.get(i).toString()));
+        }
     }
 
     private void finishRound() {
@@ -59,8 +75,8 @@ public class CarbonCopyWordGame implements Game {
     @Override
     public boolean isOneWinner() {
         int commonLength = sumLengthAllClient();
-        for (Set<String> resultsCopyWord : resultsCopyWords) {
-            if ((commonLength - resultsCopyWord.size()) == 0) {
+        for (int i = 0; i < resultsCopyWords.size(); i++){
+            if ((commonLength - (resultsCopyWords.get(i).size() + room.getDictionaryClients().get(i).size())) == 0){
                 return true;
             }
         }
@@ -80,7 +96,7 @@ public class CarbonCopyWordGame implements Game {
         Client client = null;
         int commonLength = sumLengthAllClient();
         for (int i = 0; i < resultsCopyWords.size(); i++) {
-            if ((commonLength - resultsCopyWords.get(i).size()) == 0) {
+            if ((commonLength - (resultsCopyWords.get(i).size() + room.getDictionaryClients().get(i).size())) == 0) {
                 client = room.getClientsRoom().get(i);
             }
         }

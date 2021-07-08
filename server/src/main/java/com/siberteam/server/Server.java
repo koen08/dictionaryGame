@@ -29,9 +29,7 @@ public class Server {
 
     public String createRoom(Room room) {
         int randomId = new Random().nextInt(1000);
-        if (rooms.get(randomId) == null) {
-            rooms.put(randomId, room);
-        }
+        rooms.putIfAbsent(randomId, room);
         return "ID комнаты для подключения - " + randomId;
     }
 
