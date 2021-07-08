@@ -57,7 +57,9 @@ public class MainClassClient {
         System.out.println(Color.ANSI_BLUE.paint("/connect [id_room] - подключение к комнате"));
         System.out.println(Color.ANSI_BLUE.paint("/start - запуск игры"));
         System.out.println(Color.ANSI_BLUE.paint("/exit - отключиться от сервера"));
+        System.out.println(Color.ANSI_BLUE.paint("/exit_room - выход из комнаты"));
         System.out.println(Color.ANSI_BLUE.paint("/download [path] - загрузить словарь в игру"));
+        System.out.println(Color.ANSI_BLUE.paint("/send - сделать ход"));
     }
 
     public static void outputMessageConsole(String msg) {

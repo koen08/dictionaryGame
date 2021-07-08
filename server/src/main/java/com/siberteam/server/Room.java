@@ -15,7 +15,7 @@ public class Room extends Thread{
 
     @Override
     public void run() {
-        Game game = new ThiefWordGame(this);
+        Game game = new CarbonCopyWordGame(this);
         try {
             game.startGame();
         } catch (IOException | InterruptedException e) {
