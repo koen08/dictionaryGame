@@ -14,6 +14,10 @@ public class Transfer implements Serializable {
         this.message = message;
     }
 
+    public Transfer() {
+
+    }
+
     public Deque<String> getDictionaryWords() {
         return dictionaryWords;
     }

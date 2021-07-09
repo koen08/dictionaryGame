@@ -11,7 +11,7 @@ public class ThiefWordGame implements Game {
         this.room = room;
     }
 
-    public void startGame() throws IOException, InterruptedException {
+    public void startGame(TypePlay typePlay) throws IOException, InterruptedException {
         room.messageRoom(Color.ANSI_YELLOW.paint("Игра началась!"));
         Random random = new Random();
         while (!isOneWinner()) {

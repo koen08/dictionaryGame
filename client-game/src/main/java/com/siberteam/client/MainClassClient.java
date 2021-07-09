@@ -6,13 +6,14 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class MainClassClient {
+    public static List<String> dictionaryList = new ArrayList<>();
+    public static ClientManager client;
 
     public static void main(String[] args) {
         try {
             outputMessageConsole("Введите команду /help, чтобы посмотреть возможные команды");
-            ClientManager client = new ClientManager();
+            client = new ClientManager();
             Random random = new Random();
-            List<String> dictionaryList = new ArrayList<>();
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             MessageReaderThread messageReaderThread = new MessageReaderThread(client);
             messageReaderThread.start();
@@ -48,6 +49,15 @@ public class MainClassClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void makeMove() throws IOException {
+        Random random = new Random();
+        Transfer transfer = new Transfer();
+        transfer.setMessage(dictionaryList.get(random.nextInt(dictionaryList.size())));
+        transfer.setClientActions(ClientActions.MADE_MOVE);
+        outputMessageConsole("Вы отправили случайное слово. Ожидайте начала раунда!");
+        client.sendMsgToServer(transfer);
     }
 
     private static void outputHelper() {

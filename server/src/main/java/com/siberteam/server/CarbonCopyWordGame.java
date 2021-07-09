@@ -15,12 +15,15 @@ public class CarbonCopyWordGame implements Game {
     }
 
     @Override
-    public void startGame() throws IOException {
+    public void startGame(TypePlay typePlay) throws IOException {
         doSlotsForClient();
         int round = 0;
         random = new Random();
         room.messageRoom(
                 Color.ANSI_GREEN.paint("Ожидание хода всех игроков. Введите команду /send чтобы сделать ход"));
+        if (typePlay.equals(TypePlay.AUTO_PLAY)) {
+            room.messageRoom("/auto");
+        }
         while (!isOneWinner()) {
             if (everyoneMadeMove()) {
                 round++;
@@ -34,6 +37,10 @@ public class CarbonCopyWordGame implements Game {
                 room.messageRoom(
                         Color.ANSI_GREEN.paint(
                                 "Ожидание хода всех игроков. Введите команду /send чтобы сделать ход"));
+
+                if (typePlay.equals(TypePlay.AUTO_PLAY)) {
+                    room.messageRoom("/auto");
+                }
             }
         }
         Client clientWinner = searchWinner();
@@ -44,7 +51,7 @@ public class CarbonCopyWordGame implements Game {
     }
 
     private void sendActualDictionaryAllClients() throws IOException {
-        for (int i = 0; i < room.getClientsRoom().size(); i++){
+        for (int i = 0; i < room.getClientsRoom().size(); i++) {
             room.getClientsRoom().get(i).sendMsgToClient(
                     Color.ANSI_BLUE.paint(
                             "На данный момент вы скопировали следующие слова: " + resultsCopyWords.get(i).toString()));
@@ -75,8 +82,8 @@ public class CarbonCopyWordGame implements Game {
     @Override
     public boolean isOneWinner() {
         int commonLength = sumLengthAllClient();
-        for (int i = 0; i < resultsCopyWords.size(); i++){
-            if ((commonLength - (resultsCopyWords.get(i).size() + room.getDictionaryClients().get(i).size())) == 0){
+        for (int i = 0; i < resultsCopyWords.size(); i++) {
+            if ((commonLength - (resultsCopyWords.get(i).size() + room.getDictionaryClients().get(i).size())) == 0) {
                 return true;
             }
         }

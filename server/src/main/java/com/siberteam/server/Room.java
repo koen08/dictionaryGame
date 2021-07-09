@@ -6,28 +6,30 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Room extends Thread{
+public class Room extends Thread {
     static final int INDEX_CREATOR = 0;
     private List<Client> clientsRoom = new CopyOnWriteArrayList<>();
     private List<Deque<String>> dictionaryClients = new CopyOnWriteArrayList<>();
     private List<StringBuilder> slotClients = new CopyOnWriteArrayList<>();
     private boolean isGameStart = false;
+    private TypePlay typePlay;
 
     @Override
     public void run() {
         Game game = new CarbonCopyWordGame(this);
         try {
-            game.startGame();
+            game.startGame(typePlay);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void startGame(Client client) throws IOException, InterruptedException {
+    public void startGame(Client client, String typePlay) throws IOException {
         if (client.equals(clientsRoom.get(INDEX_CREATOR))) {
             if (clientsRoom.size() > 1) {
                 isGameStart = true;
                 if (isAllReadyWithDictionary() && isUniquenessDictionaries()) {
+                    this.typePlay = TypePlay.getEnumFromCommand(typePlay);
                     start();
                 }
                 isGameStart = false;

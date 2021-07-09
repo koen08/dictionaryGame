@@ -69,7 +69,7 @@ public class Client extends Thread {
                         }
                         break;
                     case START_GAME:
-                        room.startGame(this);
+                        room.startGame(this, transfer.getMessage());
                         break;
                     case DOWNLOAD_DICTIONARY:
                         if (transfer.getDictionaryWords() != null) {
@@ -91,12 +91,11 @@ public class Client extends Thread {
                         break;
                 }
             }
-        } catch (SocketException se){
-                LoggerError.log("Пользователь " + nickName + " принудительно закрыл программу");
-                server.removeClient(this);
-                isNonExit = false;
-        }
-        catch (Exception e) {
+        } catch (SocketException se) {
+            LoggerError.log("Пользователь " + nickName + " принудительно закрыл программу");
+            server.removeClient(this);
+            isNonExit = false;
+        } catch (Exception e) {
             LoggerError.log(e.getMessage());
         }
     }
